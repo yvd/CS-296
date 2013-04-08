@@ -36,17 +36,13 @@
 using namespace std;
 
 #include "dominos.hpp"
-
+// Bottom Ground , Surface to support the plank, The Trapezium Plank
 namespace cs296
 {
   dominos_t::dominos_t()
   {
     //Bottom Ground
-	/*
-	It provides support to the two sea-saws kept over it. It is a where the simulation terminates.
-	The basket kept on right sea-saw catches the heavy spehere kept on the revolving platform.
-	It is simlpy a thin visible line created using b2EdgeShape in Box2D.
-	*/
+
     b2Body* b1;
     {
       b2EdgeShape shape;
@@ -58,24 +54,39 @@ namespace cs296
     }
 
     //Surface to support the plank
-	/*
-	Since, the trapezium plank is a movable/dynamic object, it needs a surface to support it. 
-	This support is provided to it by this static thin surface. Without this horizontal surface,
-	the trapezium plank will fall down under the influence of gravity.
-	*/
+
     b2Body* b10;
     {
       b2EdgeShape shape;
-      shape.Set(b2Vec2(31.0f, 30.0f), b2Vec2(41.0f, 30.0f));
+      shape.Set(b2Vec2(25.0f, 30.0f), b2Vec2(41.0f, 30.0f));
 	
       b2BodyDef bd;
       b10 = m_world->CreateBody(&bd);
       b10->CreateFixture(&shape, 0.0f);
     }
-      
 
+      //The Trapezium Plank
+	b2Body* plankBody;
+      {        
+        b2PolygonShape poly;
+        b2Vec2 vertices[4];
+        vertices[0].Set(-5,0);
+        vertices[1].Set(10,0);
+        vertices[2].Set(10,5);
+        vertices[3].Set(0,5);
+        poly.Set(vertices, 4);
+        b2FixtureDef wedgefd;
+        wedgefd.shape = &poly;
+        wedgefd.density = 0.5f;
+        wedgefd.friction = 0.1f;
+        wedgefd.restitution = 0.0f;
+        b2BodyDef wedgebd;
+        wedgebd.type = b2_dynamicBody;
+        wedgebd.position.Set(31.0f, 30.0f);
+        plankBody = m_world->CreateBody(&wedgebd);
+        plankBody->CreateFixture(&wedgefd);
+      }
 
-    }
   }
   sim_t *sim = new sim_t("Dominos", dominos_t::create);
 }
