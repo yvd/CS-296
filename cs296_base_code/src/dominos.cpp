@@ -21,7 +21,7 @@
  * Department of Computer Science and Engineering, IIT Bombay
  * Instructor: Parag Chaudhuri
  */
-//Added: Pulley System, Heavy Sphere on revolving platform, Revolving platform
+//Added: 
 
 #include "cs296_base.hpp"
 #include "render.hpp"
@@ -34,7 +34,7 @@
 
 #include <cstring>
 using namespace std;
-//Added : 
+//Added : Left see-saw system. Right see-saw system 
 #include "dominos.hpp"
 
 namespace cs296
@@ -155,7 +155,6 @@ namespace cs296
       sbody->CreateFixture(&ballfd);
     }
       
-
      {
       //The Trapezium Plank
 	b2Body* plankBody;
@@ -478,6 +477,162 @@ namespace cs296
       ballbd.position.Set(8.2f, 31.0f);
       sbody = m_world->CreateBody(&ballbd);
       sbody->CreateFixture(&ballfd);
+    }
+
+    //The right see-saw system
+    {
+      //The triangle wedge
+      b2Body* sbody;
+      b2PolygonShape poly;
+      b2Vec2 vertices[3];
+      vertices[0].Set(-1,0);
+      vertices[1].Set(1,0);
+      vertices[2].Set(0,2.0);
+      poly.Set(vertices, 3);
+      b2FixtureDef wedgefd;
+      wedgefd.shape = &poly;
+      wedgefd.density = 10.0f;
+      wedgefd.friction = 0.0f;
+      wedgefd.restitution = 0.0f;
+      b2BodyDef wedgebd;
+      wedgebd.position.Set(-14.0f, 0.0f);
+      sbody = m_world->CreateBody(&wedgebd);
+      sbody->CreateFixture(&wedgefd);
+
+      //The plank on top of the wedge
+      b2PolygonShape shape;
+      shape.SetAsBox(7.0f, 0.2f);
+      b2BodyDef bd2;
+      bd2.position.Set(-14.0f, 2.2f);
+      bd2.type = b2_dynamicBody;
+      b2Body* body = m_world->CreateBody(&bd2);
+      b2FixtureDef *fd0 = new b2FixtureDef;
+      fd0->density = 0.5f;
+      fd0->shape = new b2PolygonShape;
+      fd0->shape = &shape;
+      fd0->friction = 0.0f;
+      body->CreateFixture(fd0);
+
+      b2RevoluteJointDef jd;
+      b2Vec2 anchor;
+      anchor.Set(-14.0f, 2.2f);
+      jd.Initialize(sbody, body, anchor);
+      m_world->CreateJoint(&jd);
+
+      b2BodyDef *bd = new b2BodyDef;
+      bd->type = b2_dynamicBody;
+      bd->position.Set(-20.0f, 2.5f);
+      bd->fixedRotation = false;
+      
+      //The open box
+      b2FixtureDef *fd1 = new b2FixtureDef;
+      fd1->density = 0.3;
+      fd1->friction = 0.3;
+      fd1->restitution = 0.f;
+      fd1->shape = new b2PolygonShape;
+      b2PolygonShape bs1;
+      bs1.SetAsBox(2,0.2, b2Vec2(0.f,-1.9f), 0);
+      fd1->shape = &bs1;
+      b2FixtureDef *fd2 = new b2FixtureDef;
+      fd2->density = 0.3;
+      fd2->friction = 1.0;
+      fd2->restitution = 0.f;
+      fd2->shape = new b2PolygonShape;
+      b2PolygonShape bs2;
+      bs2.SetAsBox(0.2,2, b2Vec2(2.0f,0.f), 0);
+      fd2->shape = &bs2;
+      b2FixtureDef *fd3 = new b2FixtureDef;
+      fd3->density = 0.3;
+      fd3->friction = 1.0;
+      fd3->restitution = 0.f;
+      fd3->shape = new b2PolygonShape;
+      b2PolygonShape bs3;
+      bs3.SetAsBox(0.2,2, b2Vec2(-2.0f,0.f), 0);
+      fd3->shape = &bs3;
+      
+      b2Body* box1 = m_world->CreateBody(bd);
+      box1->CreateFixture(fd1);
+      box1->CreateFixture(fd2);
+      box1->CreateFixture(fd3);
+    }
+
+
+    //The left see-saw system
+    {
+      //The triangle wedge
+      b2Body* sbody;
+      b2PolygonShape poly;
+      b2Vec2 vertices[3];
+      vertices[0].Set(-1,0);
+      vertices[1].Set(1,0);
+      vertices[2].Set(0,1.5);
+      poly.Set(vertices, 3);
+      b2FixtureDef wedgefd;
+      wedgefd.shape = &poly;
+      wedgefd.density = 10.0f;
+      wedgefd.friction = 0.0f;
+      wedgefd.restitution = 0.0f;
+      b2BodyDef wedgebd;
+      wedgebd.position.Set(-30.5f, 0.0f);
+      sbody = m_world->CreateBody(&wedgebd);
+      sbody->CreateFixture(&wedgefd);
+
+      //The plank on top of the wedge
+      b2PolygonShape shape;
+      shape.SetAsBox(10.0f, 0.2f);
+      b2BodyDef bd2;
+      bd2.position.Set(-30.5f, 1.5f);
+      bd2.type = b2_dynamicBody;
+      b2Body* body = m_world->CreateBody(&bd2);
+      b2FixtureDef *fd0 = new b2FixtureDef;
+      fd0->density = 1.f;
+      fd0->shape = new b2PolygonShape;
+      fd0->shape = &shape;
+      fd0->friction = 10.0f;
+      body->CreateFixture(fd0);
+
+      b2RevoluteJointDef jd;
+      b2Vec2 anchor;
+      anchor.Set(-30.5f, 1.5f);
+      jd.Initialize(sbody, body, anchor);
+      m_world->CreateJoint(&jd);
+
+      b2BodyDef *bd = new b2BodyDef;
+      bd->type = b2_dynamicBody;
+      bd->position.Set(-37.5f, 2.5f);
+      bd->fixedRotation = false;
+
+      //The open box
+      b2FixtureDef *fd1 = new b2FixtureDef;
+      fd1->density = 0.1;
+      fd1->friction = 1.5;
+      fd1->restitution = 0.f;
+      fd1->shape = new b2PolygonShape;
+      b2PolygonShape bs1;
+      bs1.SetAsBox(2,0.2, b2Vec2(0.f,-1.9f), 0);
+      fd1->shape = &bs1;
+      b2FixtureDef *fd2 = new b2FixtureDef;
+      fd2->density = 0.1;
+      fd2->friction = 1.5;
+      fd2->restitution = 0.f;
+      fd2->shape = new b2PolygonShape;
+      b2PolygonShape bs2;
+      bs2.SetAsBox(0.2,2, b2Vec2(2.0f,0.f), 0);
+      fd2->shape = &bs2;
+      b2FixtureDef *fd3 = new b2FixtureDef;
+      fd3->density = 0.1;
+      fd3->friction = 1.5;
+      fd3->restitution = 0.f;
+      fd3->shape = new b2PolygonShape;
+      b2PolygonShape bs3;
+      bs3.SetAsBox(0.2,2, b2Vec2(-2.0f,0.f), 0);
+      fd3->shape = &bs3;
+       
+      b2Body* box1 = m_world->CreateBody(bd);
+      box1->CreateFixture(fd1);
+      box1->CreateFixture(fd2);
+      box1->CreateFixture(fd3);
+
     }
 
   }
