@@ -34,9 +34,10 @@
 
 #include <cstring>
 using namespace std;
-
+// Added: The pendulum that knocks the ball off, Ground to keep sphere next to series of pendulams,
+// The sphere on the plank , The sphere next to series of pendulams, The sphere next to series of pendulams
 #include "dominos.hpp"
-// Added :  Ground to support the sphere connected to the plank,  The sphere attached to the plank
+
 namespace cs296
 {
   dominos_t::dominos_t()
@@ -77,6 +78,17 @@ namespace cs296
       b11->CreateFixture(&shape, 0.0f);
     }
 
+    //Ground to keep sphere next to series of pendulams
+    b2Body* b12;
+    {
+      b2EdgeShape shape;
+      shape.Set(b2Vec2(-1.0f, 30.0f), b2Vec2(9.0f, 30.0f));
+	
+      b2BodyDef bd;
+      b12 = m_world->CreateBody(&bd);
+      b12->CreateFixture(&shape, 0.0f);
+    }
+      
 
      {
       //The Trapezium Plank
@@ -132,6 +144,111 @@ namespace cs296
 
     }
 
+
+    //The pendulum that knocks the ball off
+    {
+      b2Body* b2;
+      {
+	b2PolygonShape shape;
+	shape.SetAsBox(1.5f, 0.25f);
+	  
+	b2BodyDef bd;
+	bd.position.Set(42.0f, 43.0f);
+	b2 = m_world->CreateBody(&bd);
+	b2->CreateFixture(&shape, 10.0f);
+      }
+	
+      b2Body* b4;
+      {
+        b2CircleShape circle;
+        circle.m_radius = 1.0;
+	  
+	b2BodyDef bd;
+	bd.type = b2_dynamicBody;
+	bd.position.Set(45.0f, 37.0f);
+	b4 = m_world->CreateBody(&bd);
+	b4->CreateFixture(&circle, 2.0f);
+      }
+	
+      b2RevoluteJointDef jd;
+      b2Vec2 anchor;
+      anchor.Set(42.0f, 43.0f);
+      jd.Initialize(b2, b4, anchor);
+      m_world->CreateJoint(&jd);
+    }
+ 
+     
+    //The train of pendulams
+    {
+     for (int i = 0; i < 8; ++i)
+     {
+      b2Body* b2;
+      {
+	b2PolygonShape shape;
+	shape.SetAsBox(1.5f, 0.25f);
+	  
+	b2BodyDef bd;
+	bd.position.Set(25.0f - i*2.1, 36.0f);
+	b2 = m_world->CreateBody(&bd);
+	b2->CreateFixture(&shape, 10.0f);
+      }
+	
+      b2Body* b4;
+      {
+        b2CircleShape circle;
+        circle.m_radius = 1.0;
+	  
+	b2BodyDef bd;
+	bd.type = b2_dynamicBody;
+	bd.position.Set(25.0f - i*2.1, 31.0f);
+	b4 = m_world->CreateBody(&bd);
+	b4->CreateFixture(&circle,1.1f);
+      }
+	
+      b2RevoluteJointDef jd;
+      b2Vec2 anchor;
+      anchor.Set(25.0f - i*2.1, 36.0f);
+      jd.Initialize(b2, b4, anchor);
+      m_world->CreateJoint(&jd);
+     }
+    }
+
+
+    //The sphere on the plank
+    {
+      b2Body* sbody;
+      b2CircleShape circle;
+      circle.m_radius = 1.0;
+	
+      b2FixtureDef ballfd;
+      ballfd.shape = &circle;
+      ballfd.density = 2.0f;
+      ballfd.friction = 0.3f;
+      ballfd.restitution = 0.0f;
+      b2BodyDef ballbd;
+      ballbd.type = b2_dynamicBody;
+      ballbd.position.Set(39.0f, 34.0f);
+      sbody = m_world->CreateBody(&ballbd);
+      sbody->CreateFixture(&ballfd);
+    }
+
+    //The sphere next to series of pendulams
+    {
+      b2Body* sbody;
+      b2CircleShape circle;
+      circle.m_radius = 1.0;
+	
+      b2FixtureDef ballfd;
+      ballfd.shape = &circle;
+      ballfd.density = 1.0f;
+      ballfd.friction = 0.0f;
+      ballfd.restitution = 1.0f;
+      b2BodyDef ballbd;
+      ballbd.type = b2_dynamicBody;
+      ballbd.position.Set(8.2f, 31.0f);
+      sbody = m_world->CreateBody(&ballbd);
+      sbody->CreateFixture(&ballfd);
+    }
 
   }
   sim_t *sim = new sim_t("Dominos", dominos_t::create);
