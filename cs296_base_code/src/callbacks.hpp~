@@ -14,6 +14,7 @@
 
 /*! 
   This file defines all the callback functions our code needs.
+  Why are they not members of a class? Can you make them into a class?
 
   Callback functions are called when a event occurs due to the press
   of a key, mouse button, or a GUI element like a menu item is

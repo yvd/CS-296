@@ -2,6 +2,10 @@
  * Base code for CS 296 Software Systems Lab 
  * Department of Computer Science and Engineering, IIT Bombay
  * Instructor: Parag Chaudhuri
+ * Group : 26
+ * Mridul Ravi Jain	(110040083)
+ * Vamsidhar Yeddu      (110050051)
+ * Sachin Chandra Bonagiri  (110050065) 
  */
 
 //! These are user defined include files
@@ -15,9 +19,8 @@
 #endif
 
 //! The namespace protects the global variables and other names from
-//! clashes in scope. Read about the use of named and unnamed
-//! namespaces in C++ Figure out where all the datatypes used below
-//! are defined
+//! clashes in scope. Namespaces allow to group entities like classes, objects and functions under a name. 
+//! This way the global scope can be divided in "sub-scopes", each one with its own name.
 namespace cs296
 {
   int32 test_index = 0;
@@ -67,7 +70,7 @@ namespace cs296
     glLoadIdentity();
     
     //! Notice the type casting 
-    //! Read about explicit/implicit type casting in C++
+    //! Typecasting is making a variable of one type, such as an int, act like another type, a char, for one single operation.
     float32 ratio = static_cast<float32>(tw) / static_cast<float32>(th);
     
     b2Vec2 extents(ratio * 25.0f, 25.0f);
@@ -77,14 +80,14 @@ namespace cs296
     b2Vec2 upper = settings.view_center + extents;
   
     //! L/R/B/T extents of the view frustum
-    //! Find where this function is defined
+    //! gluOrtho2D() sets the units of the screen coordinate system
     gluOrtho2D(lower.x, upper.x, lower.y, upper.y);
   }
   
   
   void callbacks_t::keyboard_cb(unsigned char key, int x, int y)
   {
-    //! What are these?
+    
     B2_NOT_USED(x);
     B2_NOT_USED(y);
     
@@ -117,7 +120,7 @@ namespace cs296
       settings.pause = !settings.pause;
       break;
       
-      //! The default case. Why is this needed?
+      //! The default case. This is needed if user presses any other key than z x r p .
     default:
       if (test)
 	{
@@ -182,7 +185,7 @@ namespace cs296
   
   void callbacks_t::mouse_cb(int32 button, int32 state, int32 x, int32 y)
   {
-    //! Use the mouse to move things around - figure out how this works?
+    //! Use the mouse to move things around 
     if (button == GLUT_LEFT_BUTTON)
       {
 	int mod = glutGetModifiers();
@@ -281,6 +284,8 @@ namespace cs296
   
   void callbacks_t::restart_cb(int)
   {
+   //! Creates a new test pointer after deleting the previous one.
+   //! Resizes the window frame to original size.
     delete test;
     entry = cs296::sim;
     test = entry->create_fcn();
@@ -289,6 +294,7 @@ namespace cs296
   
   void callbacks_t::pause_cb(int)
   {
+   //! If unpaused, then pauses it. Else does the opposite.
     settings.pause = !settings.pause;
   }
   

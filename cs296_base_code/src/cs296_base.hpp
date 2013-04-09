@@ -1,25 +1,12 @@
-/*
-* Copyright (c) 2006-2009 Erin Catto http://www.box2d.org
-*
-* This software is provided 'as-is', without any express or implied
-* warranty.  In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
-* 1. The origin of this software must not be misrepresented; you must not
-* claim that you wrote the original software. If you use this software
-* in a product, an acknowledgment in the product documentation would be
-* appreciated but is not required.
-* 2. Altered source versions must be plainly marked as such, and must not be
-* misrepresented as being the original software.
-* 3. This notice may not be removed or altered from any source distribution.
-*/
 
 /* 
  * Base code for CS 296 Software Systems Lab 
  * Department of Computer Science and Engineering, IIT Bombay
  * Instructor: Parag Chaudhuri
+ * Group : 26
+ * Mridul Ravi Jain	(110040083)
+ * Vamsidhar Yeddu      (110050051)
+ * Sachin Chandra Bonagiri  (110050065) 
  */
 
 
@@ -35,18 +22,49 @@
 namespace cs296
 {
 
-  //! What is the difference between a class and a struct in C++?
+  //! Creates a base_sim_t class & setting_t struct.
+  //! In class data members and member functions are private by default. In structure members are public by default.
   class base_sim_t;
   struct settings_t;
   
-  //! Why do we use a typedef
+  //! Typedef is used to create our own types based on existing data types
   typedef base_sim_t* sim_create_fcn(); 
 
   //! Simulation settings. Some can be controlled in the GUI.
   struct settings_t
   {
     //! Notice the initialization of the class members in the constructor
-    //! How is this happening?
+    //! Constructors can initialize their members by passing values as aruments in constructor definition
+
+    /*! \brief settings_t
+
+      This structure instantiates various default settings at the start of simulation such as setting up iteration count and frequncy of 
+stepping.
+
+      Deatails:
+      
+      view_center(0.0f, 20.0f)	\n Construct A 2D column vector named view_center using two float32 coordinates\n \n 
+      hz(60.0f),		\n Set a time step of 1/60 seconds\n \n 
+      velocity_iterations(8)	\n Set iteration count of 8 for velocity which computes the impulses necessary for the bodies to move 
+				correctly\n \n 
+      position_iterations(3) \n Set iteration count of 3 for position which adjusts the positions of the bodies to reduce overlap and 
+				joint detachment\n \n 
+      draw_shapes(1)		\n This enable the drawing of shapes\n \n 
+      draw_joints(1)		\n This enables the drawing of joints\n \n 
+      draw_AABBs(0)		\n Disable axis-aligned bounding box\n \n 
+      draw_pairs(0)		\n Set No of collisuion pairs to 0\n \n 
+      draw_contact_points(0)	\n This disables the drawing of contact points\n \n 
+      draw_contact_normals(0)	\n This disables the drawing of contact normals\n \n 
+      draw_contact_forces(0)	\n This disables action of contact forces\n \n 
+      draw_friction_forces(0)	\n This disables action of friction points\n \n 
+      draw_COMs(0)		\n This is to disable drawing of center of mass\n \n 
+      enable_warm_starting(1)	\n Enable warm starting:using information generated in the previous simulation timestep use in the current timestep\n \n 
+      enable_continuous(1)	\n Enable continuous simulation\n \n 
+      enable_sub_stepping(0)	\n Disable step-wise(sub step) simulation\n \n 
+      pause(0)			\n Disable Pause button\n \n 
+      single_step(0)		\n Disable Single Step\n \n 
+      */
+
     settings_t() :
       view_center(0.0f, 20.0f),
       hz(60.0f),
@@ -94,6 +112,12 @@ namespace cs296
   
   struct sim_t
   {
+      /*! \brief sim_t
+
+      This structure contains a character pointer variable and a function to start the simulation.
+      
+      */
+
     const char *name;
     sim_create_fcn *create_fcn;
 
@@ -107,6 +131,18 @@ namespace cs296
   const int32 k_max_contact_points = 2048;  
   struct contact_point_t
   {
+      /*! \brief contact_point_t
+
+      This structure holds the properties of a contact point t
+
+      Details:
+      
+      b2Fixture* fixtureA 	\n Holds the fixture of first body\n \n 
+      b2Fixture* fixtureB	\n Holds the fixture of second body\n \n 
+      b2Vec2 normal		\n Normal vector at contact point \n \n 
+      b2Vec2 position		\n Position vector at contact point\n \n 
+      b2PointState state	\n Holds the state of a contact point\n \n 
+      */
     b2Fixture* fixtureA;
     b2Fixture* fixtureB;
     b2Vec2 normal;
@@ -115,12 +151,21 @@ namespace cs296
   };
   
   class base_sim_t : public b2ContactListener
-  {
+  {      /*! \brief base_sim_t
+
+      This class inhrits the b2ContactListener class and handles the user actions on the interface.
+
+      Details:
+
+      \n It contains virtual destructors which are called in order and helps in simulation. It also contains callbacks for derived classes. \n \n
+      
+    
+      */
   public:
     
     base_sim_t();
 
-    //! Virtual destructors - amazing objects. Why are these necessary?
+    //! Virtual destructors are useful when you can delete an instance of a derived class through a pointer to base class.
     virtual ~base_sim_t();
     
     void set_text_line(int32 line) { m_text_line = line; }
@@ -150,10 +195,18 @@ namespace cs296
       B2_NOT_USED(impulse);
     }
 
-  //!How are protected members different from private memebers of a class in C++ ?
+   //!Private members are only accessible within the class defining them.
+
+//!Protected members are accessible in the class that defines them and in classes that inherit from that class.
+//!A friend class can access the private and protected members of the class in which it is declared as a friend.
+//!A friend function is a function that is not a member of a class but has access to the class's private and protected members. 
+//!Friend functions are not considered class members; they are normal external functions that are given special access privileges.
+//!A friend function is declared by the class that is granting access. 
+//!The friend declaration can be placed anywhere in the class declaration. 
+//!It is not affected by the access control keywords.
   protected:
 
-    //! What are Friend classes?
+
     friend class contact_listener_t;
     
     b2Body* m_ground_body;
