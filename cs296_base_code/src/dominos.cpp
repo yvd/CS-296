@@ -21,7 +21,7 @@
  * Department of Computer Science and Engineering, IIT Bombay
  * Instructor: Parag Chaudhuri
  */
-
+//Added: Dominos, Horizontal shelf on which dominos are kept, Upper revolving dumble, lower revolving dumble
 
 #include "cs296_base.hpp"
 #include "render.hpp"
@@ -34,8 +34,8 @@
 
 #include <cstring>
 using namespace std;
-// Added: The pendulum that knocks the ball off, Ground to keep sphere next to series of pendulams,
-// The sphere on the plank , The sphere next to series of pendulams, The sphere next to series of pendulams
+//Added : Horizontal shelf on which dominos are kept, Dominos, Upper Revolving Dumble, Lower Revolving Dumble
+//Added : The sphere which topples the dominos, The sphere which falls on the see-saw system
 #include "dominos.hpp"
 
 namespace cs296
@@ -88,8 +88,74 @@ namespace cs296
       b12 = m_world->CreateBody(&bd);
       b12->CreateFixture(&shape, 0.0f);
     }
-      
 
+    //Horizontal shelf on which dominos are kept
+    {
+      b2PolygonShape shape;
+      shape.SetAsBox(16.0f, 0.25f);
+	
+      b2BodyDef bd;
+      bd.position.Set(-17.0f, 19.0f);
+      b2Body* ground = m_world->CreateBody(&bd);
+      ground->CreateFixture(&shape, 0.0f);
+    }
+	
+    //Dominos
+    {
+      b2PolygonShape shape;
+      shape.SetAsBox(0.1f, 1.0f);
+	
+      b2FixtureDef fd;
+      fd.shape = &shape;
+      fd.density = 2.0f;
+      fd.friction = 0.1f;
+		
+      for (int i = 0; i < 10; ++i)
+	{
+	  b2BodyDef bd;
+	  bd.type = b2_dynamicBody;
+	  bd.position.Set(-19.5f + 1.0f * i, 20.25f);
+	  b2Body* body = m_world->CreateBody(&bd);
+	  body->CreateFixture(&fd);
+	}
+    }
+
+    //The sphere which topples the dominos
+    {
+      b2Body* sbody;
+      b2CircleShape circle;
+      circle.m_radius = 1.0;
+	
+      b2FixtureDef ballfd;
+      ballfd.shape = &circle;
+      ballfd.density = 0.1f;
+      ballfd.friction = 0.0f;
+      ballfd.restitution = 0.0f;
+      b2BodyDef ballbd;
+      ballbd.type = b2_dynamicBody;
+      ballbd.position.Set(-3.0f, 20.0f);
+      sbody = m_world->CreateBody(&ballbd);
+      sbody->CreateFixture(&ballfd);
+    }
+
+    //The sphere which falls on the see-saw system
+    {
+      b2Body* sbody;
+      b2CircleShape circle;
+      circle.m_radius = 1.0;
+	
+      b2FixtureDef ballfd;
+      ballfd.shape = &circle;
+      ballfd.density = 0.5f;
+      ballfd.friction = 0.0f;
+      ballfd.restitution = 0.0f;
+      b2BodyDef ballbd;
+      ballbd.type = b2_dynamicBody;
+      ballbd.position.Set(-22.0f, 20.0f);
+      sbody = m_world->CreateBody(&ballbd);
+      sbody->CreateFixture(&ballfd);
+    }
+      
      {
       //The Trapezium Plank
 	b2Body* plankBody;
@@ -211,6 +277,64 @@ namespace cs296
       jd.Initialize(b2, b4, anchor);
       m_world->CreateJoint(&jd);
      }
+    }
+
+
+    //The upper revolving dumble
+    {
+      b2PolygonShape shape;
+      shape.SetAsBox(0.1f, 3.0f);
+	
+      b2BodyDef bd;
+      bd.position.Set(-2.0f, 28.0f);
+      bd.type = b2_dynamicBody;
+      b2Body* body = m_world->CreateBody(&bd);
+      b2FixtureDef *fd = new b2FixtureDef;
+      fd->density = 1.f;
+      fd->shape = new b2PolygonShape;
+      fd->shape = &shape;
+      body->CreateFixture(fd);
+
+      b2BodyDef bd2;
+      bd2.position.Set(-2.0f, 28.0f);
+      b2Body* body2 = m_world->CreateBody(&bd2);
+
+      b2RevoluteJointDef jointDef;
+      jointDef.bodyA = body;
+      jointDef.bodyB = body2;
+      jointDef.localAnchorA.Set(0,0);
+      jointDef.localAnchorB.Set(0,0);
+      jointDef.collideConnected = false;
+      m_world->CreateJoint(&jointDef);
+    }
+
+
+    //The lower revolving dumble
+    {
+      b2PolygonShape shape;
+      shape.SetAsBox(0.1f, 3.0f);
+	
+      b2BodyDef bd;
+      bd.position.Set(-1.8f, 23.0f);
+      bd.type = b2_dynamicBody;
+      b2Body* body = m_world->CreateBody(&bd);
+      b2FixtureDef *fd = new b2FixtureDef;
+      fd->density = 1.f;
+      fd->shape = new b2PolygonShape;
+      fd->shape = &shape;
+      body->CreateFixture(fd);
+
+      b2BodyDef bd2;
+      bd2.position.Set(-1.8f, 23.0f);
+      b2Body* body2 = m_world->CreateBody(&bd2);
+
+      b2RevoluteJointDef jointDef;
+      jointDef.bodyA = body;
+      jointDef.bodyB = body2;
+      jointDef.localAnchorA.Set(0,0);
+      jointDef.localAnchorB.Set(0,0);
+      jointDef.collideConnected = false;
+      m_world->CreateJoint(&jointDef);
     }
 
 
