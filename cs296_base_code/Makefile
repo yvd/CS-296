@@ -21,6 +21,8 @@ SRCDIR = $(PROJECT_ROOT)/src
 OBJDIR = $(PROJECT_ROOT)/obj
 BINDIR = $(PROJECT_ROOT)/bin
 DOCDIR = $(PROJECT_ROOT)/doc
+SCRIPTSDIR = $(PROJECT_ROOT)/scripts
+INSTALLPATH = $(PROJECT_ROOT)/install
 
 # Library Paths
 BOX2D_ROOT=$(EXTERNAL_ROOT)
@@ -55,20 +57,32 @@ WARN_FMT="${WARN_COLOR}%30s\n${NO_COLOR}"
 SRCS := $(wildcard $(SRCDIR)/*.cpp)
 INCS := $(wildcard $(SRCDIR)/*.hpp)
 OBJS := $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-
+OBJS2 := $(filter-out $(OBJDIR)/main.o, $(OBJS))
+OBJS1 := $(filter-out $(OBJDIR)/main_disabled_gui.o, $(OBJS))
 
 .PHONY: all setup doc clean distclean
 
-all: setup $(BINDIR)/$(TARGET)
+all: compile setup gui
 
 setup:
 	@$(ECHO) "Setting up compilation..."
 	@mkdir -p obj
 	@mkdir -p bin
 
-$(BINDIR)/$(TARGET): $(OBJS)
+gui: setup $(OBJS1)
 	@$(PRINTF) "$(MESG_COLOR)Building executable:$(NO_COLOR) $(FILE_COLOR) %16s$(NO_COLOR)" "$(notdir $@)"
-	@$(CC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS) 2> temp.log || touch temp.err
+	@$(CC) -o $(BINDIR)/$(TARGET) $(LDFLAGS) $(OBJS1) $(LIBS) 2> temp.log || touch temp.err
+	@if test -e temp.err; \
+	then $(PRINTF) $(ERR_FMT) $(ERR_STRING) && $(CAT) temp.log; \
+	elif test -s temp.log; \
+	then $(PRINTF) $(WARN_FMT) $(WARN_STRING) && $(CAT) temp.log; \
+	else $(PRINTF) $(OK_FMT) $(OK_STRING); \
+	fi;
+	@$(RM) -f temp.log temp.err
+
+nongui: setup $(OBJS2)
+	@$(PRINTF) "$(MESG_COLOR)Building executable:$(NO_COLOR) $(FILE_COLOR) %16s$(NO_COLOR)" "$(notdir $@)"
+	@$(CC) -o $(BINDIR)/$(TARGET) $(LDFLAGS) $(OBJS2) $(LIBS) 2> temp.log || touch temp.err
 	@if test -e temp.err; \
 	then $(PRINTF) $(ERR_FMT) $(ERR_STRING) && $(CAT) temp.log; \
 	elif test -s temp.log; \
@@ -90,6 +104,35 @@ $(OBJS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
 	fi;
 	@$(RM) -f temp.log temp.err
 
+texreport: $(DOCDIR)/Project_Final_Report.tex
+	@$(ECHO) -n "Generating report..."
+	@latex $(DOCDIR)/Project_Final_Report.tex
+	@bibtex Project_Final_Report.aux
+	@latex $(DOCDIR)/Project_Final_Report.tex
+	@latex $(DOCDIR)/Project_Final_Report.tex
+	@dvips Project_Final_Report.dvi
+	@ps2pdf Project_Final_Report.ps $(DOCDIR)/Project_Final_Report.pdf
+	@rm *.aux *.blg *.bbl *.dvi *.log *.ps   
+	@$(ECHO) "Done"
+
+lab05_plot01: $(SCRIPTSDIR)/*
+	@$./$(SCRIPTSDIR)/gen_data.sh
+	@$./$(SCRIPTSDIR)/gen_csv.sh
+	@mkdir -p plots
+	@gnuplot $(SCRIPTSDIR)/*.gpt
+	@rm Table*
+lab05_plot02: $(SCRIPTSDIR)/*
+	@$./$(SCRIPTSDIR)/gen_data_csv.sh
+	@mkdir -p plots
+	@gnuplot $(SCRIPTSDIR)/*.gpt
+	@rm Table*
+
+lab09_report: $(BINDIR)/*
+	@mkdir -p plots	
+	@mkdir -p data
+	@$./$(SCRIPTSDIR)/g26_gen_csv.py
+	@$./$(SCRIPTSDIR)/g26_gen_plots.py
+	@$./$(SCRIPTSDIR)/g26_gen_html.py
 doc:
 	@$(ECHO) -n "Generating Doxygen Documentation ...  "
 	@$(RM) -rf doc/html
@@ -98,8 +141,22 @@ doc:
 
 clean:
 	@$(ECHO) -n "Cleaning up..."
-	@$(RM) -rf $(OBJDIR) *~ $(DEPS) $(SRCDIR)/*~
+	@$(RM) -rf $(OBJDIR) *~ $(DEPS) $(SRCDIR)/*~ $(INSTALLPATH) $(DOCDIR)/*.pdf 
 	@$(ECHO) "Done"
 
 distclean: clean
 	@$(RM) -rf $(BINDIR) $(DOCDIR)/html
+
+dist: distclean
+	@chmod +x $(SCRIPTSDIR)/dist-script.sh
+	@$(SCRIPTSDIR)/dist-script.sh
+
+compile: $(EXTERNAL_ROOT)/lib/libBox2D.a
+	@chmod +x $(SCRIPTSDIR)/compile-script.sh
+	@$(SCRIPTSDIR)/compile-script.sh
+
+install: texreport doc
+	@mkdir -p $(INSTALLPATH)
+	@cp $(BINDIR)/cs296_base $(INSTALLPATH)/cs296_base
+	@cp $(DOCDIR)/Project_Final_Report.pdf $(INSTALLPATH)/Project_Final_Report.pdf
+	@cp -r $(DOCDIR)/html $(INSTALLPATH)/html
