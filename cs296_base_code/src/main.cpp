@@ -1,25 +1,11 @@
-/*
-* Copyright (c) 2006-2007 Erin Catto http://www.box2d.org
-*
-* This software is provided 'as-is', without any express or implied
-* warranty.  In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
-* 1. The origin of this software must not be misrepresented; you must not
-* claim that you wrote the original software. If you use this software
-* in a product, an acknowledgment in the product documentation would be
-* appreciated but is not required.
-* 2. Altered source versions must be plainly marked as such, and must not be
-* misrepresented as being the original software.
-* 3. This notice may not be removed or altered from any source distribution.
-*/
-
 /* 
  * Base code for CS 296 Software Systems Lab 
  * Department of Computer Science and Engineering, IIT Bombay
  * Instructor: Parag Chaudhuri
+ * Group : 26
+ * Mridul Ravi Jain	(110040083)
+ * Vamsidhar Yeddu      (110050051)
+ * Sachin Chandra Bonagiri  (110050065) 
  */
 
 //! These are user defined include files
@@ -29,8 +15,6 @@
 #include "callbacks.hpp"
 
 //! GLUI is the library used for drawing the GUI
-//! Learn more about GLUI by reading the GLUI documentation
-//! Learn to use preprocessor diectives to make your code portable
 #ifndef __APPLE__
 #include "GL/glui.h"
 #else
@@ -39,11 +23,11 @@
 
 //! These are standard include files
 //! These are usually available at standard system paths like /usr/include
-//! Read about the use of include files in C++
 #include <cstdio>
 
 
-//! Notice the use of extern. Why is it used here?
+//! Extern: declares a variable or function and specifies that it has external linkage (its name is visible from files other than the one 
+//! in which it's defined in this case callbacks.cpp). 
 namespace cs296
 {
   extern int32 test_index;
@@ -60,7 +44,7 @@ namespace cs296
 };
 
 //! This opens up the cs296 namespace
-//! What is the consequence of opening up a namespace?
+//! Opening up a namespace results in contents declared in namespace to be visible in the current code.
 using namespace cs296;
 
 
